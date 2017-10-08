@@ -87,6 +87,13 @@ namespace
             resource_lock.unlock();
         }
     }
+    
+    void SendMessage(uint64_t msg)
+    {
+        DeviceHandle handle = DeviceIDToHandle((DeviceID)msg);
+        DWORD packet = (msg >> 32);
+        midiOutShortMsg(handle, packet);
+    }
 
     // Retrieve a name of a given device.
     std::string GetDeviceName(DeviceHandle handle)
@@ -204,4 +211,10 @@ EXPORT_API uint64_t MidiJackDequeueIncomingData()
     resource_lock.unlock();
 
     return msg.Encode64Bit();
+}
+
+// Send a midi message
+EXPORT_API void MidiJackSendMessage(uint64_t msg)
+{
+    SendMessage(msg);
 }

@@ -39,14 +39,14 @@ namespace MidiJack
 
         void OnGUI()
         {
-            var endpointCount = CountEndpoints();
+			var sourceCount = MidiDriver.CountSources();
 
-            // Endpoints
-            var temp = "Detected MIDI devices:";
-            for (var i = 0; i < endpointCount; i++)
+            // Sources
+            var temp = "Detected MIDI inputs:";
+			for (var i = 0; i < sourceCount; i++)
             {
-                var id = GetEndpointIdAtIndex(i);
-                var name = GetEndpointName(id);
+				var id = MidiDriver.GetSourceIdAtIndex(i);
+				var name = MidiDriver.GetEndpointName(id);
                 temp += "\n" + id.ToString("X8") + ": " + name;
             }
             EditorGUILayout.HelpBox(temp, MessageType.None);
@@ -56,6 +56,18 @@ namespace MidiJack
             foreach (var message in MidiDriver.Instance.History)
                 temp += "\n" + message.ToString();
             EditorGUILayout.HelpBox(temp, MessageType.None);
+
+			var destinationCount = MidiDriver.CountDestinations();
+
+			// Destinations
+			temp = "Detected MIDI outputs:";
+			for (var i = 0; i < destinationCount; i++)
+			{
+				var id = MidiDriver.GetDestinationIdAtIndex(i);
+				var name = MidiDriver.GetEndpointName(id);
+				temp += "\n" + id.ToString("X8") + ": " + name;
+			}
+			EditorGUILayout.HelpBox(temp, MessageType.None);
         }
 
         #endregion
@@ -77,23 +89,6 @@ namespace MidiJack
             }
 
             _countToUpdate = _updateInterval;
-        }
-
-        #endregion
-
-        #region Native Plugin Interface
-
-        [DllImport("MidiJackPlugin", EntryPoint="MidiJackCountEndpoints")]
-        static extern int CountEndpoints();
-
-        [DllImport("MidiJackPlugin", EntryPoint="MidiJackGetEndpointIDAtIndex")]
-        static extern uint GetEndpointIdAtIndex(int index);
-
-        [DllImport("MidiJackPlugin")]
-        static extern System.IntPtr MidiJackGetEndpointName(uint id);
-
-        static string GetEndpointName(uint id) {
-            return Marshal.PtrToStringAnsi(MidiJackGetEndpointName(id));
         }
 
         #endregion
