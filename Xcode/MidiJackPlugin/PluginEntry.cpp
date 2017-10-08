@@ -192,19 +192,19 @@ extern "C" int MidiJackCountSources()
     return static_cast<int>(source_ids.size());
 }
 
+// Counts the number of destinations.
+extern "C" int MidiJackCountDestinations()
+{
+    if (!ResetIfRequired()) return 0;
+    return static_cast<int>(destination_ids.size());
+}
+
 // Get the unique ID of an source.
 extern "C" uint32_t MidiJackGetSourceIDAtIndex(int index)
 {
     if (!ResetIfRequired()) return 0;
     if (index < 0 || index >= source_ids.size()) return 0;
     return source_ids[index];
-}
-
-// Counts the number of destinations.
-extern "C" int MidiJackCountDestinations()
-{
-    if (!ResetIfRequired()) return 0;
-    return static_cast<int>(destination_ids.size());
 }
 
 // Get the unique ID of an destination.

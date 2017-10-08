@@ -28,28 +28,28 @@ using System.Runtime.InteropServices;
 
 namespace MidiJack
 {
-	public class MidiSource : MonoBehaviour
+    public class MidiSource : MonoBehaviour
     {
-		[SerializeField]
-		private uint _endpointId;
-		public uint endpointId {
-			get { return _endpointId; }
-			set {
-				MidiDriver.RemoveSource(this);
-				
-				_endpointId = value;
-				_endpointName = MidiDriver.GetEndpointName(value);
+        [SerializeField]
+        private uint _endpointId;
+        public uint endpointId {
+            get { return _endpointId; }
+            set {
+                MidiDriver.RemoveSource(this);
+                
+                _endpointId = value;
+                _endpointName = MidiDriver.GetEndpointName(value);
 
-				MidiDriver.AddSource(this);
-			}
-		}
+                MidiDriver.AddSource(this);
+            }
+        }
 
-		[SerializeField]
-		private string _endpointName;
-		public string endpointName {
-			get { return _endpointName; }
-		}
-		
+        [SerializeField]
+        private string _endpointName;
+        public string endpointName {
+            get { return _endpointName; }
+        }
+        
         #region Internal Data
 
         class ChannelState
@@ -75,7 +75,7 @@ namespace MidiJack
         // Channel state array
         ChannelState[] _channelArray;
 
-		int _numSources = 0;
+        int _numSources = 0;
 
         #endregion
 
@@ -120,72 +120,72 @@ namespace MidiJack
 
         public delegate void NoteOnDelegate(MidiChannel channel, int note, float velocity);
         public delegate void NoteOffDelegate(MidiChannel channel, int note);
-		public delegate void KnobDelegate(MidiChannel channel, int knobNumber, float knobValue);
-		public delegate void RealtimeDelegate(MidiRealtime realtimeMsg);
+        public delegate void KnobDelegate(MidiChannel channel, int knobNumber, float knobValue);
+        public delegate void RealtimeDelegate(MidiRealtime realtimeMsg);
 
         public NoteOnDelegate noteOnDelegate { get; set; }
         public NoteOffDelegate noteOffDelegate { get; set; }
-		public KnobDelegate knobDelegate { get; set; }
-		public RealtimeDelegate realtimeDelegate { get; set; }
+        public KnobDelegate knobDelegate { get; set; }
+        public RealtimeDelegate realtimeDelegate { get; set; }
 
         #endregion
 
         #region Public Methods
 
-		public Queue<MidiMessage> msgQueue;
+        public Queue<MidiMessage> msgQueue;
 
-		#endregion
+        #endregion
 
-		#region Monobehaviour
+        #region Monobehaviour
 
-		void Start()
+        void Start()
         {
             _channelArray = new ChannelState[17];
             for (var i = 0; i < 17; i++)
                 _channelArray[i] = new ChannelState();
 
-			msgQueue = new Queue<MidiMessage>();
+            msgQueue = new Queue<MidiMessage>();
         }
 
-		void CheckConnection()
-		{
-			_numSources = MidiDriver.CountSources();
+        void CheckConnection()
+        {
+            _numSources = MidiDriver.CountSources();
 
-			bool validId = false;
-			int indexOfName = -1;
-			for (var i = 0; i < _numSources; i++)
-			{
-				var id = MidiDriver.GetSourceIdAtIndex(i);
+            bool validId = false;
+            int indexOfName = -1;
+            for (var i = 0; i < _numSources; i++)
+            {
+                var id = MidiDriver.GetSourceIdAtIndex(i);
 
-				// Device still available?
-				if (endpointId == id)
-				{
-					validId = true;
-					break;
-				}
+                // Device still available?
+                if (endpointId == id)
+                {
+                    validId = true;
+                    break;
+                }
 
-				// Device name available?
-				if (_endpointName == MidiDriver.GetEndpointName(id))
-					indexOfName = i;
-			}
+                // Device name available?
+                if (_endpointName == MidiDriver.GetEndpointName(id))
+                    indexOfName = i;
+            }
 
-			if (validId)
-			{
-				MidiDriver.AddSource(this);
-			}
-			else if (indexOfName != -1)
-			{
-				endpointId = MidiDriver.GetSourceIdAtIndex(indexOfName);
-				MidiDriver.AddSource(this);
-			}
-			else
-				MidiDriver.RemoveSource(this);
-		}
+            if (validId)
+            {
+                MidiDriver.AddSource(this);
+            }
+            else if (indexOfName != -1)
+            {
+                endpointId = MidiDriver.GetSourceIdAtIndex(indexOfName);
+                MidiDriver.AddSource(this);
+            }
+            else
+                MidiDriver.RemoveSource(this);
+        }
 
         void Update()
         {
-			if (_numSources != MidiDriver.CountSources())
-				CheckConnection();
+            if (_numSources != MidiDriver.CountSources())
+                CheckConnection();
 
             // Update the note state array.
             foreach (var cs in _channelArray)
@@ -200,16 +200,16 @@ namespace MidiJack
                 }
             }
 
-			MidiDriver.UpdateAll();
+            MidiDriver.UpdateAll();
 
             // Process the message queue.
             while (true)
             {
-				if (msgQueue.Count == 0)
-					break;
+                if (msgQueue.Count == 0)
+                    break;
 
-				// Pop from the queue.
-				MidiMessage message = msgQueue.Dequeue();
+                // Pop from the queue.
+                MidiMessage message = msgQueue.Dequeue();
 
                 // Split the first byte.
                 var statusCode = message.status >> 4;
@@ -247,32 +247,32 @@ namespace MidiJack
                         knobDelegate((MidiChannel)channelNumber, message.data1, level);
                 }
 
-				// System message?
-				if (statusCode == 0xf) 
-				{
-					if (realtimeDelegate != null) 
-					{
+                // System message?
+                if (statusCode == 0xf) 
+                {
+                    if (realtimeDelegate != null) 
+                    {
 
-						if (message.status == (byte)MidiRealtime.Clock)
-							realtimeDelegate(MidiRealtime.Clock);
-						
-						if (message.status == (byte)MidiRealtime.Start)
-							realtimeDelegate(MidiRealtime.Start);
+                        if (message.status == (byte)MidiRealtime.Clock)
+                            realtimeDelegate(MidiRealtime.Clock);
+                        
+                        if (message.status == (byte)MidiRealtime.Start)
+                            realtimeDelegate(MidiRealtime.Start);
 
-						if (message.status == (byte)MidiRealtime.Continue)
-							realtimeDelegate(MidiRealtime.Continue);
+                        if (message.status == (byte)MidiRealtime.Continue)
+                            realtimeDelegate(MidiRealtime.Continue);
 
-						if (message.status == (byte)MidiRealtime.Stop)
-							realtimeDelegate(MidiRealtime.Stop);
-					}
-				}
+                        if (message.status == (byte)MidiRealtime.Stop)
+                            realtimeDelegate(MidiRealtime.Stop);
+                    }
+                }
             }
         }
 
-		void OnDestroy()
-		{
-			MidiDriver.RemoveSource(this);
-		}
+        void OnDestroy()
+        {
+            MidiDriver.RemoveSource(this);
+        }
 
         #endregion
     }
