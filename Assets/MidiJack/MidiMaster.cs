@@ -34,9 +34,11 @@ namespace MidiJack
         MidiMaster()
         {
             GameObject sourceGo = new GameObject("Midi Master Source");
+            sourceGo.hideFlags = HideFlags.HideInHierarchy;
             _source = sourceGo.AddComponent<MidiSource>();
 
             GameObject destinationGo = new GameObject("Midi Master Destination");
+            destinationGo.hideFlags = HideFlags.HideInHierarchy;
             _destination = destinationGo.AddComponent<MidiDestination>();
         }
         
