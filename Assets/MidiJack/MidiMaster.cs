@@ -28,112 +28,112 @@ namespace MidiJack
 {
     public class MidiMaster
     {
-		MidiSource _source;
-		MidiDestination _destination;
+        MidiSource _source;
+        MidiDestination _destination;
 
-		MidiMaster()
-		{
-			GameObject sourceGo = new GameObject("Midi Master Source");
-			_source = sourceGo.AddComponent<MidiSource>();
+        MidiMaster()
+        {
+            GameObject sourceGo = new GameObject("Midi Master Source");
+            _source = sourceGo.AddComponent<MidiSource>();
 
-			GameObject destinationGo = new GameObject("Midi Master Destination");
-			_destination = destinationGo.AddComponent<MidiDestination>();
-		}
-		
-		#region Singleton
+            GameObject destinationGo = new GameObject("Midi Master Destination");
+            _destination = destinationGo.AddComponent<MidiDestination>();
+        }
+        
+        #region Singleton
 
-		static MidiMaster _instance = null;
+        static MidiMaster _instance = null;
 
-		public static MidiMaster Instance {
-			get {
-				if (_instance == null)
-					_instance = new MidiMaster();
+        public static MidiMaster Instance {
+            get {
+                if (_instance == null)
+                    _instance = new MidiMaster();
 
-				return _instance;
-			}
-		}
+                return _instance;
+            }
+        }
 
-		#endregion
-		
+        #endregion
+        
         // MIDI event delegates
-		public static MidiSource.NoteOnDelegate noteOnDelegate {
+        public static MidiSource.NoteOnDelegate noteOnDelegate {
             get { return Instance._source.noteOnDelegate; }
-			set { Instance._source.noteOnDelegate = value; }
+            set { Instance._source.noteOnDelegate = value; }
         }
 
-		public static MidiSource.NoteOffDelegate noteOffDelegate {
-			get { return Instance._source.noteOffDelegate; }
-			set { Instance._source.noteOffDelegate = value; }
+        public static MidiSource.NoteOffDelegate noteOffDelegate {
+            get { return Instance._source.noteOffDelegate; }
+            set { Instance._source.noteOffDelegate = value; }
         }
 
-		public static MidiSource.KnobDelegate knobDelegate {
-			get { return Instance._source.knobDelegate; }
-			set { Instance._source.knobDelegate = value; }
+        public static MidiSource.KnobDelegate knobDelegate {
+            get { return Instance._source.knobDelegate; }
+            set { Instance._source.knobDelegate = value; }
         }
 
         // Returns the key state (on: velocity, off: zero).
         public static float GetKey(MidiChannel channel, int noteNumber)
         {
-			return Instance._source.GetKey(channel, noteNumber);
+            return Instance._source.GetKey(channel, noteNumber);
         }
 
         public static float GetKey(int noteNumber)
         {
-			return Instance._source.GetKey(MidiChannel.All, noteNumber);
+            return Instance._source.GetKey(MidiChannel.All, noteNumber);
         }
 
         // Returns true if the key was pressed down in the current frame.
         public static bool GetKeyDown(MidiChannel channel, int noteNumber)
         {
-			return Instance._source.GetKeyDown(channel, noteNumber);
+            return Instance._source.GetKeyDown(channel, noteNumber);
         }
 
         public static bool GetKeyDown(int noteNumber)
         {
-			return Instance._source.GetKeyDown(MidiChannel.All, noteNumber);
+            return Instance._source.GetKeyDown(MidiChannel.All, noteNumber);
         }
 
         // Returns true if the key was released in the current frame.
         public static bool GetKeyUp(MidiChannel channel, int noteNumber)
         {
-			return Instance._source.GetKeyUp(channel, noteNumber);
+            return Instance._source.GetKeyUp(channel, noteNumber);
         }
 
         public static bool GetKeyUp(int noteNumber)
         {
-			return Instance._source.GetKeyUp(MidiChannel.All, noteNumber);
+            return Instance._source.GetKeyUp(MidiChannel.All, noteNumber);
         }
 
         // Provides the CC (knob) list.
         public static int[] GetKnobNumbers(MidiChannel channel)
         {
-			return Instance._source.GetKnobNumbers(channel);
+            return Instance._source.GetKnobNumbers(channel);
         }
 
         public static int[] GetKnobNumbers()
         {
-			return Instance._source.GetKnobNumbers(MidiChannel.All);
+            return Instance._source.GetKnobNumbers(MidiChannel.All);
         }
 
         // Returns the CC (knob) value.
         public static float GetKnob(MidiChannel channel, int knobNumber, float defaultValue = 0)
         {
-			return Instance._source.GetKnob(channel, knobNumber, defaultValue);
+            return Instance._source.GetKnob(channel, knobNumber, defaultValue);
         }
 
         public static float GetKnob(int knobNumber, float defaultValue = 0)
         {
-			return Instance._source.GetKnob(MidiChannel.All, knobNumber, defaultValue);
+            return Instance._source.GetKnob(MidiChannel.All, knobNumber, defaultValue);
         }
 
-		public static void SendKeyDown(MidiChannel channel, int noteNumber, int velocity)
-		{
-			Instance._destination.SendKeyDown(channel, noteNumber, velocity);
-		}
+        public static void SendKeyDown(MidiChannel channel, int noteNumber, int velocity)
+        {
+            Instance._destination.SendKeyDown(channel, noteNumber, velocity);
+        }
 
-		public static void SendKeyUp(MidiChannel channel, int noteNumber)
-		{
-			Instance._destination.SendKeyUp(channel, noteNumber);
-		}
+        public static void SendKeyUp(MidiChannel channel, int noteNumber)
+        {
+            Instance._destination.SendKeyUp(channel, noteNumber);
+        }
     }
 }

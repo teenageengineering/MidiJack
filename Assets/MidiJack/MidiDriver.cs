@@ -32,9 +32,9 @@ namespace MidiJack
         #region Internal Data
 
         // Last update frame number
-		int _lastFrame;
+        int _lastFrame;
 
-		Dictionary<uint, MidiSource> _sourceMap;
+        Dictionary<uint, MidiSource> _sourceMap;
 
         #endregion
 
@@ -80,7 +80,7 @@ namespace MidiJack
 
         MidiDriver()
         {
-			_sourceMap = new Dictionary<uint, MidiSource>();
+            _sourceMap = new Dictionary<uint, MidiSource>();
 
             #if UNITY_EDITOR
             _messageHistory = new Queue<MidiMessage>();
@@ -109,72 +109,72 @@ namespace MidiJack
             }
         }
 
-		void Update()
-		{
-			while (true)
-			{
-				// Pop from the queue.
-				var data = DequeueIncomingData();
-				if (data == 0) break;
+        void Update()
+        {
+            while (true)
+            {
+                // Pop from the queue.
+                var data = DequeueIncomingData();
+                if (data == 0) break;
 
-				// Relay the message.
-				var message = new MidiMessage(data);
+                // Relay the message.
+                var message = new MidiMessage(data);
 
-				if (_sourceMap.ContainsKey(message.endpoint))
-				{
-					MidiSource source = _sourceMap[message.endpoint];
-					source.msgQueue.Enqueue(message);
-				}
+                if (_sourceMap.ContainsKey(message.endpoint))
+                {
+                    MidiSource source = _sourceMap[message.endpoint];
+                    source.msgQueue.Enqueue(message);
+                }
 
-				// Send to all?
-				if (_sourceMap.ContainsKey(0))
-				{
-					MidiSource source = _sourceMap[0];
-					source.msgQueue.Enqueue(message);
-				}
+                // Send to all?
+                if (_sourceMap.ContainsKey(0))
+                {
+                    MidiSource source = _sourceMap[0];
+                    source.msgQueue.Enqueue(message);
+                }
 
-				#if UNITY_EDITOR
-				// Record the message.
-				_totalMessageCount++;
-				_messageHistory.Enqueue(message);
-				#endif
-			}
+                #if UNITY_EDITOR
+                // Record the message.
+                _totalMessageCount++;
+                _messageHistory.Enqueue(message);
+                #endif
+            }
 
-			#if UNITY_EDITOR
-			// Truncate the history.
-			while (_messageHistory.Count > 8)
-				_messageHistory.Dequeue();
-			#endif
-		}
+            #if UNITY_EDITOR
+            // Truncate the history.
+            while (_messageHistory.Count > 8)
+                _messageHistory.Dequeue();
+            #endif
+        }
 
-		#endregion
+        #endregion
 
-		#region Native Plugin Interface
+        #region Native Plugin Interface
 
-		[DllImport("MidiJackPlugin", EntryPoint="MidiJackCountSources")]
-		public static extern int CountSources();
+        [DllImport("MidiJackPlugin", EntryPoint="MidiJackCountSources")]
+        public static extern int CountSources();
 
-		[DllImport("MidiJackPlugin", EntryPoint="MidiJackCountDestinations")]
-		public static extern int CountDestinations();
+        [DllImport("MidiJackPlugin", EntryPoint="MidiJackCountDestinations")]
+        public static extern int CountDestinations();
 
-		[DllImport("MidiJackPlugin", EntryPoint="MidiJackGetSourceIDAtIndex")]
-		public static extern uint GetSourceIdAtIndex(int index);
+        [DllImport("MidiJackPlugin", EntryPoint="MidiJackGetSourceIDAtIndex")]
+        public static extern uint GetSourceIdAtIndex(int index);
 
-		[DllImport("MidiJackPlugin", EntryPoint="MidiJackGetDestinationIDAtIndex")]
-		public static extern uint GetDestinationIdAtIndex(int index);
+        [DllImport("MidiJackPlugin", EntryPoint="MidiJackGetDestinationIDAtIndex")]
+        public static extern uint GetDestinationIdAtIndex(int index);
 
-		[DllImport("MidiJackPlugin")]
-		public static extern System.IntPtr MidiJackGetEndpointName(uint id);
+        [DllImport("MidiJackPlugin")]
+        public static extern System.IntPtr MidiJackGetEndpointName(uint id);
 
-		public static string GetEndpointName(uint id) {
-			return Marshal.PtrToStringAnsi(MidiJackGetEndpointName(id));
-		}
+        public static string GetEndpointName(uint id) {
+            return Marshal.PtrToStringAnsi(MidiJackGetEndpointName(id));
+        }
 
         [DllImport("MidiJackPlugin", EntryPoint="MidiJackDequeueIncomingData")]
         public static extern ulong DequeueIncomingData();
 
-		[DllImport("MidiJackPlugin", EntryPoint="MidiJackSendMessage")]
-		public static extern void SendMessage(ulong msg);
+        [DllImport("MidiJackPlugin", EntryPoint="MidiJackSendMessage")]
+        public static extern void SendMessage(ulong msg);
 
         #endregion
 
@@ -186,25 +186,25 @@ namespace MidiJack
             get {
                 if (_instance == null)
                     _instance = new MidiDriver();
-				
+                
                 return _instance;
             }
         }
 
-		public static void UpdateAll()
-		{
-			Instance.UpdateIfNeeded();
-		}
+        public static void UpdateAll()
+        {
+            Instance.UpdateIfNeeded();
+        }
 
-		public static void AddSource(MidiSource source)
-		{
-			Instance._sourceMap[source.endpointId] = source;
-		}
+        public static void AddSource(MidiSource source)
+        {
+            Instance._sourceMap[source.endpointId] = source;
+        }
 
-		public static void RemoveSource(MidiSource source)
-		{
-			Instance._sourceMap.Remove(source.endpointId);
-		}
+        public static void RemoveSource(MidiSource source)
+        {
+            Instance._sourceMap.Remove(source.endpointId);
+        }
 
         #endregion
     }

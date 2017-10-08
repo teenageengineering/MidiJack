@@ -39,14 +39,14 @@ namespace MidiJack
 
         void OnGUI()
         {
-			var sourceCount = MidiDriver.CountSources();
+            var sourceCount = MidiDriver.CountSources();
 
             // Sources
             var temp = "Detected MIDI inputs:";
-			for (var i = 0; i < sourceCount; i++)
+            for (var i = 0; i < sourceCount; i++)
             {
-				var id = MidiDriver.GetSourceIdAtIndex(i);
-				var name = MidiDriver.GetEndpointName(id);
+                var id = MidiDriver.GetSourceIdAtIndex(i);
+                var name = MidiDriver.GetEndpointName(id);
                 temp += "\n" + id.ToString("X8") + ": " + name;
             }
             EditorGUILayout.HelpBox(temp, MessageType.None);
@@ -57,17 +57,17 @@ namespace MidiJack
                 temp += "\n" + message.ToString();
             EditorGUILayout.HelpBox(temp, MessageType.None);
 
-			var destinationCount = MidiDriver.CountDestinations();
+            var destinationCount = MidiDriver.CountDestinations();
 
-			// Destinations
-			temp = "Detected MIDI outputs:";
-			for (var i = 0; i < destinationCount; i++)
-			{
-				var id = MidiDriver.GetDestinationIdAtIndex(i);
-				var name = MidiDriver.GetEndpointName(id);
-				temp += "\n" + id.ToString("X8") + ": " + name;
-			}
-			EditorGUILayout.HelpBox(temp, MessageType.None);
+            // Destinations
+            temp = "Detected MIDI outputs:";
+            for (var i = 0; i < destinationCount; i++)
+            {
+                var id = MidiDriver.GetDestinationIdAtIndex(i);
+                var name = MidiDriver.GetEndpointName(id);
+                temp += "\n" + id.ToString("X8") + ": " + name;
+            }
+            EditorGUILayout.HelpBox(temp, MessageType.None);
         }
 
         #endregion

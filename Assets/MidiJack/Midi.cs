@@ -61,27 +61,27 @@ namespace MidiJack
             data2 = (byte)((data >> 48) & 0xff);
         }
 
-		public ulong Encode64Bit()
-		{
-			ulong ul = endpoint;
-			ul |= (ulong)status << 32;
-			ul |= (ulong)data1 << 40;
-			ul |= (ulong)data2 << 48;
-			return ul;
-		}
+        public ulong Encode64Bit()
+        {
+            ulong ul = endpoint;
+            ul |= (ulong)status << 32;
+            ul |= (ulong)data1 << 40;
+            ul |= (ulong)data2 << 48;
+            return ul;
+        }
 
         public override string ToString()
         {
             const string fmt = "s({0:X2}) d({1:X2},{2:X2}) from {3:X8}";
-			return string.Format(fmt, status, data1, data2, endpoint);
+            return string.Format(fmt, status, data1, data2, endpoint);
         }
-	}
+    }
 
-	public enum MidiRealtime
-	{
-		Clock = 0xf8,
-		Start = 0xfa,
-		Continue,
-		Stop
-	}
+    public enum MidiRealtime
+    {
+        Clock = 0xf8,
+        Start = 0xfa,
+        Continue,
+        Stop
+    }
 }
