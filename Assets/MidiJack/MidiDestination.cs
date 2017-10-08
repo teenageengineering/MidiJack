@@ -27,105 +27,107 @@ using System.Runtime.InteropServices;
 
 namespace MidiJack
 {
-	public class MidiDestination : MonoBehaviour
-	{
-		[SerializeField]
-		private uint _endpointId;
-		public uint endpointId {
-			get { return _endpointId; }
-			set {
-				_endpointId = value;
-				_endpointName = MidiDriver.GetEndpointName(value);
-			}
-		}
+    public class MidiDestination : MonoBehaviour
+    {
+        [SerializeField]
+        private uint _endpointId;
 
-		[SerializeField]
-		private string _endpointName;
-		public string endpointName {
-			get { return _endpointName; }
-		}
+        public uint endpointId {
+            get { return _endpointId; }
+            set {
+                _endpointId = value;
+                _endpointName = MidiDriver.GetEndpointName(value);
+            }
+        }
 
-		int _numDestinations = 0;
+        [SerializeField]
+        private string _endpointName;
 
-		void Update()
-		{
-			if (_numDestinations != MidiDriver.CountDestinations())
-				CheckConnection();
-		}
+        public string endpointName {
+            get { return _endpointName; }
+        }
 
-		void CheckConnection()
-		{
-			_numDestinations = MidiDriver.CountDestinations();
+        int _numDestinations = 0;
 
-			// Restore MidiDriver connection
-			int indexOfName = -1;
-			for (var i = 0; i < _numDestinations; i++)
-			{
-				var id = MidiDriver.GetDestinationIdAtIndex(i);
-				if (endpointId == id)
-					break;
+        void Update()
+        {
+            if (_numDestinations != MidiDriver.CountDestinations())
+                CheckConnection();
+        }
 
-				if (_endpointName == MidiDriver.GetEndpointName(id))
-					indexOfName = i;
-			}
+        void CheckConnection()
+        {
+            _numDestinations = MidiDriver.CountDestinations();
 
-			if (indexOfName != -1)
-				endpointId = MidiDriver.GetDestinationIdAtIndex(indexOfName);
-		}
+            // Restore MidiDriver connection
+            int indexOfName = -1;
+            for (var i = 0; i < _numDestinations; i++)
+            {
+                var id = MidiDriver.GetDestinationIdAtIndex(i);
+                if (endpointId == id)
+                    break;
 
-		public void SendMessage(MidiMessage msg)
-		{
-			if (endpointId == 0)
-			{
-				// Send to all.
-				for (var i = 0; i < MidiDriver.CountDestinations(); i++)
-				{
-					msg.endpoint = MidiDriver.GetDestinationIdAtIndex(i);
-					MidiDriver.SendMessage(msg.Encode64Bit());
-				}
-			}
-			else
-			{
-				msg.endpoint = endpointId;
-				MidiDriver.SendMessage(msg.Encode64Bit());
-			}
-		}
+                if (_endpointName == MidiDriver.GetEndpointName(id))
+                    indexOfName = i;
+            }
 
-		public void SendKeyDown(MidiChannel channel, int noteNumber, int velocity)
-		{
-			MidiMessage msg = new MidiMessage();
-			msg.status = (byte)(0x90 | ((int)channel & 0x0f));
-			msg.data1 = (byte)noteNumber;
-			msg.data2 = (byte)velocity;
+            if (indexOfName != -1)
+                endpointId = MidiDriver.GetDestinationIdAtIndex(indexOfName);
+        }
 
-			SendMessage(msg);
-		}
+        public void SendMessage(MidiMessage msg)
+        {
+            if (endpointId == 0)
+            {
+                // Send to all.
+                for (var i = 0; i < MidiDriver.CountDestinations(); i++)
+                {
+                    msg.endpoint = MidiDriver.GetDestinationIdAtIndex(i);
+                    MidiDriver.SendMessage(msg.Encode64Bit());
+                }
+            }
+            else
+            {
+                msg.endpoint = endpointId;
+                MidiDriver.SendMessage(msg.Encode64Bit());
+            }
+        }
 
-		public void SendKeyUp(MidiChannel channel, int noteNumber)
-		{
-			MidiMessage msg = new MidiMessage();
-			msg.status = (byte)(0x80 | ((int)channel & 0x0f));
-			msg.data1 = (byte)noteNumber;
+        public void SendKeyDown(MidiChannel channel, int noteNumber, int velocity)
+        {
+            MidiMessage msg = new MidiMessage();
+            msg.status = (byte)(0x90 | ((int)channel & 0x0f));
+            msg.data1 = (byte)noteNumber;
+            msg.data2 = (byte)velocity;
 
-			SendMessage(msg);
-		}
+            SendMessage(msg);
+        }
 
-		public void SendKnob(MidiChannel channel, int knobNumber, float value)
-		{
-			MidiMessage msg = new MidiMessage();
-			msg.status = (byte)(0xb0 | ((int)channel & 0x0f));
-			msg.data1 = (byte)knobNumber;
-			msg.data2 = (byte)(value * 127);
+        public void SendKeyUp(MidiChannel channel, int noteNumber)
+        {
+            MidiMessage msg = new MidiMessage();
+            msg.status = (byte)(0x80 | ((int)channel & 0x0f));
+            msg.data1 = (byte)noteNumber;
 
-			SendMessage(msg);
-		}
+            SendMessage(msg);
+        }
 
-		public void SendRealtime(MidiJack.MidiRealtime code)
-		{
-			MidiMessage msg = new MidiMessage();
-			msg.status = (byte)code;
+        public void SendKnob(MidiChannel channel, int knobNumber, float value)
+        {
+            MidiMessage msg = new MidiMessage();
+            msg.status = (byte)(0xb0 | ((int)channel & 0x0f));
+            msg.data1 = (byte)knobNumber;
+            msg.data2 = (byte)(value * 127);
 
-			SendMessage(msg);
-		}
-	}
+            SendMessage(msg);
+        }
+
+        public void SendRealtime(MidiJack.MidiRealtime code)
+        {
+            MidiMessage msg = new MidiMessage();
+            msg.status = (byte)code;
+
+            SendMessage(msg);
+        }
+    }
 }
