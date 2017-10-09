@@ -31,21 +31,21 @@ namespace MidiJack
     public class MidiSource : MonoBehaviour
     {
         [SerializeField]
-        private uint _endpointId;
+        private uint _endpointId = 0;
         public uint endpointId {
             get { return _endpointId; }
             set {
                 MidiDriver.RemoveSource(this);
                 
                 _endpointId = value;
-                _endpointName = MidiDriver.GetSourceName(value);
+                _endpointName = (_endpointId != 0) ? MidiDriver.GetSourceName(value) : "";
 
                 MidiDriver.AddSource(this);
             }
         }
 
         [SerializeField]
-        private string _endpointName;
+        private string _endpointName = "";
         public string endpointName {
             get { return _endpointName; }
         }
@@ -153,20 +153,27 @@ namespace MidiJack
 
             bool validId = false;
             int indexOfName = -1;
-            for (var i = 0; i < _numSources; i++)
+
+            // All sources?
+            if (endpointId == 0)
+                validId = true;
+            else
             {
-                var id = MidiDriver.GetSourceIdAtIndex(i);
-
-                // Device still available?
-                if (endpointId == id)
+                for (var i = 0; i < _numSources; i++)
                 {
-                    validId = true;
-                    break;
-                }
+                    var id = MidiDriver.GetSourceIdAtIndex(i);
 
-                // Device name available?
-                if (_endpointName == MidiDriver.GetSourceName(id))
-                    indexOfName = i;
+                    // Device still available?
+                    if (endpointId == id)
+                    {
+                        validId = true;
+                        break;
+                    }
+
+                    // Device name available?
+                    if (_endpointName == MidiDriver.GetSourceName(id))
+                        indexOfName = i;
+                }
             }
 
             if (validId)

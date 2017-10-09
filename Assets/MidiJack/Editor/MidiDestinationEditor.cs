@@ -17,6 +17,10 @@ namespace MidiJack
 
             List<uint> destinationIds = new List<uint>();
             List<string> destinationNames = new List<string>();
+
+            destinationIds.Add(0);
+            destinationNames.Add("All");
+
             for (var i = 0; i < destinationCount; i++)
             {
                 var id = MidiDriver.GetDestinationIdAtIndex(i);
@@ -26,19 +30,20 @@ namespace MidiJack
 
             int destinationIndex = destinationIds.FindIndex(x => x == destination.endpointId);
 
-            // Show name of missing endpoint.
+            // Show missing endpoint.
             if (destinationIndex == -1)
             {
+                destinationIds.Add(destination.endpointId);
                 destinationNames.Add(destination.endpointName + " *");
-                destinationIndex = destinationCount;
+                destinationIndex = destinationIds.Count - 1;
             }
 
             EditorGUI.BeginChangeCheck();
             destinationIndex = EditorGUILayout.Popup("Destination", destinationIndex, destinationNames.ToArray());
             if (EditorGUI.EndChangeCheck())
             {
-                if (destinationIndex != destinationCount)
-                    destination.endpointId = MidiDriver.GetDestinationIdAtIndex(destinationIndex);
+                if (destinationIds[destinationIndex] != destination.endpointId)
+                    destination.endpointId = destinationIds[destinationIndex];
             }
         }
     }

@@ -30,19 +30,17 @@ namespace MidiJack
     public class MidiDestination : MonoBehaviour
     {
         [SerializeField]
-        private uint _endpointId;
-
+        private uint _endpointId = 0;
         public uint endpointId {
             get { return _endpointId; }
             set {
                 _endpointId = value;
-                _endpointName = MidiDriver.GetDestinationName(value);
+                _endpointName = (_endpointId != 0) ? MidiDriver.GetDestinationName(value) : "";
             }
         }
 
         [SerializeField]
-        private string _endpointName;
-
+        private string _endpointName = "";
         public string endpointName {
             get { return _endpointName; }
         }
@@ -58,6 +56,10 @@ namespace MidiJack
         void CheckConnection()
         {
             _numDestinations = MidiDriver.CountDestinations();
+
+            // All destinations?
+            if (endpointId == 0)
+                return;
 
             // Restore MidiDriver connection
             int indexOfName = -1;
