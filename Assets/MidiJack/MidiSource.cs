@@ -138,7 +138,7 @@ namespace MidiJack
 
         #region Monobehaviour
 
-        void Start()
+        void Awake()
         {
             _channelArray = new ChannelState[17];
             for (var i = 0; i < 17; i++)

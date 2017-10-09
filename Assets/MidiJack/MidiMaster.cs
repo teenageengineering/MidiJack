@@ -137,5 +137,15 @@ namespace MidiJack
         {
             Instance._destination.SendKeyUp(channel, noteNumber);
         }
+
+        public static void SendKnob(MidiChannel channel, int knobNumber, float value)
+        {
+            Instance._destination.SendKnob(channel, knobNumber, value);
+        }
+
+        public static void SendRealtime(MidiJack.MidiRealtime code)
+        {
+            Instance._destination.SendRealtime(code);
+        }
     }
 }
