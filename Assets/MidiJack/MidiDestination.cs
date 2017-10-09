@@ -36,7 +36,7 @@ namespace MidiJack
             get { return _endpointId; }
             set {
                 _endpointId = value;
-                _endpointName = MidiDriver.GetEndpointName(value);
+                _endpointName = MidiDriver.GetDestinationName(value);
             }
         }
 
@@ -67,7 +67,7 @@ namespace MidiJack
                 if (endpointId == id)
                     break;
 
-                if (_endpointName == MidiDriver.GetEndpointName(id))
+                if (_endpointName == MidiDriver.GetDestinationName(id))
                     indexOfName = i;
             }
 

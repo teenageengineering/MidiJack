@@ -166,7 +166,7 @@ namespace
         return buffer;
     }
     
-    // Send MIDI message.
+    // Send a MIDI message.
     void SendMessage(uint64_t msg)
     {
         Byte packetBuffer[256];
@@ -199,7 +199,7 @@ extern "C" int MidiJackCountDestinations()
     return static_cast<int>(destination_ids.size());
 }
 
-// Get the unique ID of an source.
+// Get the unique ID of a source.
 extern "C" uint32_t MidiJackGetSourceIDAtIndex(int index)
 {
     if (!ResetIfRequired()) return 0;
@@ -207,7 +207,7 @@ extern "C" uint32_t MidiJackGetSourceIDAtIndex(int index)
     return source_ids[index];
 }
 
-// Get the unique ID of an destination.
+// Get the unique ID of a destination.
 extern "C" uint32_t MidiJackGetDestinationIDAtIndex(int index)
 {
     if (!ResetIfRequired()) return 0;
@@ -215,8 +215,17 @@ extern "C" uint32_t MidiJackGetDestinationIDAtIndex(int index)
     return destination_ids[index];
 }
 
-// Get the name of an endpoint.
-extern "C" const char* MidiJackGetEndpointName(uint32_t id)
+// Get the name of a source.
+extern "C" const char* MidiJackGetSourceName(uint32_t id)
+{
+    if (!ResetIfRequired()) return "(not ready)";
+    static std::string temp;
+    temp = GetEndpointName(id);
+    return temp.c_str();
+}
+
+// Get the name of a destination.
+extern "C" const char* MidiJackGetDestinationName(uint32_t id)
 {
     if (!ResetIfRequired()) return "(not ready)";
     static std::string temp;

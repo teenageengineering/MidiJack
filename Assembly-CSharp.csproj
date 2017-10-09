@@ -57,7 +57,6 @@
      <Compile Include="Assets\MidiJack\MidiDriver.cs" />
      <Compile Include="Assets\MidiJack\MidiMaster.cs" />
      <Compile Include="Assets\MidiJack\MidiSource.cs" />
-     <Compile Include="Assets\MidiJack\MidiStateUpdater.cs" />
  <Reference Include="UnityEngine.Analytics">
  <HintPath>/Applications/Unity/Unity.app/Contents/UnityExtensions/Unity/UnityAnalytics/UnityEngine.Analytics.dll</HintPath>
  </Reference>

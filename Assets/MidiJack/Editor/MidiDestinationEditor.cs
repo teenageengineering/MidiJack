@@ -21,7 +21,7 @@ namespace MidiJack
             {
                 var id = MidiDriver.GetDestinationIdAtIndex(i);
                 destinationIds.Add(id);
-                destinationNames.Add(MidiDriver.GetEndpointName(id));
+                destinationNames.Add(MidiDriver.GetDestinationName(id));
             }
 
             int destinationIndex = destinationIds.FindIndex(x => x == destination.endpointId);

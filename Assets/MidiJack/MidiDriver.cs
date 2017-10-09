@@ -164,10 +164,17 @@ namespace MidiJack
         public static extern uint GetDestinationIdAtIndex(int index);
 
         [DllImport("MidiJackPlugin")]
-        public static extern System.IntPtr MidiJackGetEndpointName(uint id);
+        public static extern System.IntPtr MidiJackGetSourceName(uint id);
 
-        public static string GetEndpointName(uint id) {
-            return Marshal.PtrToStringAnsi(MidiJackGetEndpointName(id));
+        public static string GetSourceName(uint id) {
+            return Marshal.PtrToStringAnsi(MidiJackGetSourceName(id));
+        }
+
+        [DllImport("MidiJackPlugin")]
+        public static extern System.IntPtr MidiJackGetDestinationName(uint id);
+
+        public static string GetDestinationName(uint id) {
+            return Marshal.PtrToStringAnsi(MidiJackGetDestinationName(id));
         }
 
         [DllImport("MidiJackPlugin", EntryPoint="MidiJackDequeueIncomingData")]

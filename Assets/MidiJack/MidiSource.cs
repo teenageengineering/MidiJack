@@ -38,7 +38,7 @@ namespace MidiJack
                 MidiDriver.RemoveSource(this);
                 
                 _endpointId = value;
-                _endpointName = MidiDriver.GetEndpointName(value);
+                _endpointName = MidiDriver.GetSourceName(value);
 
                 MidiDriver.AddSource(this);
             }
@@ -165,7 +165,7 @@ namespace MidiJack
                 }
 
                 // Device name available?
-                if (_endpointName == MidiDriver.GetEndpointName(id))
+                if (_endpointName == MidiDriver.GetSourceName(id))
                     indexOfName = i;
             }
 

@@ -46,7 +46,7 @@ namespace MidiJack
             for (var i = 0; i < sourceCount; i++)
             {
                 var id = MidiDriver.GetSourceIdAtIndex(i);
-                var name = MidiDriver.GetEndpointName(id);
+                var name = MidiDriver.GetSourceName(id);
                 temp += "\n" + id.ToString("X8") + ": " + name;
             }
             EditorGUILayout.HelpBox(temp, MessageType.None);
@@ -64,7 +64,7 @@ namespace MidiJack
             for (var i = 0; i < destinationCount; i++)
             {
                 var id = MidiDriver.GetDestinationIdAtIndex(i);
-                var name = MidiDriver.GetEndpointName(id);
+                var name = MidiDriver.GetDestinationName(id);
                 temp += "\n" + id.ToString("X8") + ": " + name;
             }
             EditorGUILayout.HelpBox(temp, MessageType.None);
