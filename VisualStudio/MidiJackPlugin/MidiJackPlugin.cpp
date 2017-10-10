@@ -169,16 +169,9 @@ namespace
         OutputHandle handle;
         if (midiOutOpen(&handle, index, callback, NULL, CALLBACK_FUNCTION) == MMSYSERR_NOERROR)
         {
-            if (midiOutStart(handle) == MMSYSERR_NOERROR)
-            {
-                resource_lock.lock();
-                active_handles_out.push_back(handle);
-                resource_lock.unlock();
-            }
-            else
-            {
-                midiOutClose(handle);
-            }
+            resource_lock.lock();
+            active_handles_out.push_back(handle);
+            resource_lock.unlock();
         }
     }
 
