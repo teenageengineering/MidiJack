@@ -147,5 +147,16 @@ namespace MidiJack
         {
             Instance._destination.SendRealtime(code);
         }
+
+		// Bad singleton style..
+		public static MidiSource GetSource()
+		{
+			return Instance._source;
+		}
+
+		public static MidiDestination GetDestination()
+		{
+			return Instance._destination;
+		}
     }
 }
