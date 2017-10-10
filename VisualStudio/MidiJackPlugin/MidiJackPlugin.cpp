@@ -291,7 +291,7 @@ EXPORT_API const char* MidiJackGetSourceName(uint32_t id)
 }
 
 // Get the name of a destination.
-EXPORT_API const char* MidiJackGetdestinationName(uint32_t id)
+EXPORT_API const char* MidiJackGetDestinationName(uint32_t id)
 {
     auto handle = DeviceIDToOutputHandle(id);
     static std::string buffer;
