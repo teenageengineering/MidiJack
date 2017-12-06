@@ -1,7 +1,7 @@
 MIDI Jack
 =========
 
-MIDI Jack is a MIDI input plugin for Unity.
+MIDI Jack is a MIDI plugin for Unity.
 
 ![sample](http://keijiro.github.io/MidiJack/sample.gif)
 
@@ -61,6 +61,13 @@ There are also delegates for the each type of MIDI event.
 - MidiMaster.noteOffDelegate (channel, noteNumber)
 - MidiMaster.knobDelegate (channel, knobNumber, konbValue)
 
+Use the following functions to send MIDI out.
+
+- MidiMaster.SendKeyDown(MidiChannel channel, int noteNumber, int velocity)
+- MidiMaster.SendKeyUp(MidiChannel channel, int noteNumber)
+- MidiMaster.SendKnob(MidiChannel channel, int knobNumber, float value)
+- MidiMaster.SendRealtime(MidiJack.MidiRealtime code)
+
 MIDI Monitor Window
 -------------------
 
@@ -71,11 +78,20 @@ active devices and incoming MIDI messages.
 
 The MIDI Monitor window is avilable from the menu Window -> MIDI Jack.
 
+Endpoint Selection
+-------------------
+
+MidiSource and MidiDestination provide the same functionality as MidiMaster, but for selected endpoints only.
+
+MidiSource also provides a delegate for realtime events.
+
+- MidiSource.realtimeDelegate (MidiRealtime realtimeMsg);
+
 Current Limitations
 -------------------
 
-- Currently MIDI Jack only supports Windows and OS X. No iOS support yet.
-- Only supports note and CC messages. No support for program changes nor
+- Currently MIDI Jack only supports Windows, OS X and iOS.
+- Only supports note, CC and realtime messages. No support for program changes nor
   SysEx.
 - The MIDI Jack plugin always tries to capture all available MIDI devices.
   On Windows this behavior may conflict with other MIDI applications.
