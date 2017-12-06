@@ -78,7 +78,7 @@ active devices and incoming MIDI messages.
 
 The MIDI Monitor window is avilable from the menu Window -> MIDI Jack.
 
-Endpoint Discovery And Selection
+Endpoint Selection
 -------------------
 
 MidiSource and MidiDestination provide the same functionality as MidiMaster, but for selected endpoints only.
