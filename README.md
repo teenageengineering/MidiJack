@@ -22,7 +22,7 @@ See [the troubleshooting topics][troubleshooting] if you meet any problem.
 [unitypackage]:
   https://github.com/teenageengineering/MidiJack/blob/master/MidiJack.unitypackage
 [troubleshooting]:
-  https://github.com/teenageengineering/MidiJack/wiki/Troubleshooting
+  https://github.com/keijiro/MidiJack/wiki/Troubleshooting
 
 API Reference
 -------------
