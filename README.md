@@ -20,9 +20,9 @@ That’s it!
 See [the troubleshooting topics][troubleshooting] if you meet any problem.
 
 [unitypackage]:
-  https://github.com/keijiro/MidiJack/raw/unity5/MidiJack.unitypackage
+  https://github.com/teenageengineering/MidiJack/blob/master/MidiJack.unitypackage
 [troubleshooting]:
-  https://github.com/keijiro/MidiJack/wiki/Troubleshooting
+  https://github.com/teenageengineering/MidiJack/wiki/Troubleshooting
 
 API Reference
 -------------
