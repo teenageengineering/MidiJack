@@ -24,46 +24,11 @@
 using UnityEngine;
 using System;
 using System.Collections.Generic;
-using System.Runtime.InteropServices;
 
 namespace MidiJack
 {
-    public class MidiSource : MonoBehaviour
+    public class MidiSource : MidiEndpoint
     {
-        [SerializeField]
-        private uint _endpointId = 0;
-        public uint endpointId {
-            get { return _endpointId; }
-            set {
-                MidiDriver.RemoveSource(this);
-                
-                _endpointId = value;
-                this.endpointName = (_endpointId != 0) ? MidiDriver.GetSourceName(value) : "";
-
-                MidiDriver.AddSource(this);
-            }
-        }
-
-        [SerializeField]
-        private string _endpointName = "";
-        public string endpointName {
-            get { return _endpointName; }
-            set { 
-                _endpointName = value;
-
-                if (_autoAssignMap)
-                    AutoAssignMidiMap();
-            }
-        }
-
-        [SerializeField]
-        MidiMap _midiMap;
-
-        [SerializeField]
-        bool _autoAssignMap = true;
-        
-        #region Internal Data
-
         class ChannelState
         {
             // Note state array
@@ -87,18 +52,32 @@ namespace MidiJack
         // Channel state array
         ChannelState[] _channelArray;
 
-        void AutoAssignMidiMap()
+        protected override void AddEndpoint() 
         {
-            _midiMap = MidiDriver.FindMapAtPath(_endpointName, Application.persistentDataPath);
-            if (_midiMap == null)
-                _midiMap = MidiDriver.FindMapAtPath(_endpointName, Application.streamingAssetsPath);
+            MidiDriver.AddSource(this);
         }
 
-        int _numSources = 0;
-
-        #endregion
+        protected override void RemoveEndpoint(uint endpointId) 
+        {
+            MidiDriver.RemoveSource(endpointId);
+        }
 
         #region Accessor Methods
+
+        public override uint GetEndpointIdAtIndex(int index)
+        {
+            return MidiDriver.GetSourceIdAtIndex(index);
+        }
+
+        public override string GetEndpointName(uint endpointId)
+        {
+            return MidiDriver.GetSourceName(endpointId);
+        }
+
+        public override int CountEndpoints()
+        {
+            return MidiDriver.CountSources();
+        }
 
         public float GetKey(MidiChannel channel, int noteNumber)
         {
@@ -134,7 +113,7 @@ namespace MidiJack
         {
             MidiDriver.Refresh();
             var cs = _channelArray[(int)channel];
-            if (_midiMap) knobNumber = _midiMap.Map(knobNumber);
+            if (_midiMap) knobNumber = _midiMap.JackValue(knobNumber);
             if (cs._knobMap.ContainsKey(knobNumber)) return cs._knobMap[knobNumber];
             return defaultValue;
         }
@@ -172,52 +151,9 @@ namespace MidiJack
             msgQueue = new Queue<MidiMessage>();
         }
 
-        void CheckConnection()
-        {
-            _numSources = MidiDriver.CountSources();
-
-            bool validId = false;
-            int indexOfName = -1;
-
-            // All sources?
-            if (endpointId == 0)
-                validId = true;
-            else
-            {
-                for (var i = 0; i < _numSources; i++)
-                {
-                    var id = MidiDriver.GetSourceIdAtIndex(i);
-
-                    // Device still available?
-                    if (endpointId == id)
-                    {
-                        validId = true;
-                        break;
-                    }
-
-                    // Device name available?
-                    if (_endpointName == MidiDriver.GetSourceName(id))
-                        indexOfName = i;
-                }
-            }
-
-            if (validId)
-            {
-                MidiDriver.AddSource(this);
-            }
-            else if (indexOfName != -1)
-            {
-                endpointId = MidiDriver.GetSourceIdAtIndex(indexOfName);
-                MidiDriver.AddSource(this);
-            }
-            else
-                MidiDriver.RemoveSource(this);
-        }
-
         void Update()
         {
-            if (_numSources != MidiDriver.CountSources())
-                CheckConnection();
+            Refresh();
 
             // Update the note state array.
             foreach (var cs in _channelArray)
@@ -273,7 +209,7 @@ namespace MidiJack
                     var level = 1.0f / 127 * message.data2;
                     // Update the channel if it already exists, or add a new channel.
                     int knobNumber = message.data1;
-                    if (_midiMap) knobNumber = _midiMap.Map(knobNumber);
+                    if (_midiMap) knobNumber = _midiMap.JackValue(knobNumber);
                     _channelArray[channelNumber]._knobMap[knobNumber] = level;
                     // Do again for All-ch.
                     _channelArray[(int)MidiChannel.All]._knobMap[knobNumber] = level;
@@ -286,7 +222,6 @@ namespace MidiJack
                 {
                     if (realtimeDelegate != null) 
                     {
-
                         if (message.status == (byte)MidiRealtime.Clock)
                             realtimeDelegate(MidiRealtime.Clock);
                         
@@ -305,7 +240,7 @@ namespace MidiJack
 
         void OnDestroy()
         {
-            MidiDriver.RemoveSource(this);
+            MidiDriver.RemoveSource(_endpointId);
         }
 
         #endregion
