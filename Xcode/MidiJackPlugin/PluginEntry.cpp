@@ -74,14 +74,33 @@ namespace
         
         // Transform the packets into MIDI messages and push it to the message queue.
         const MIDIPacket *packet = &packetList->packet[0];
-        for (int packetCount = 0; packetCount < packetList->numPackets; packetCount++) {
-            // Extract MIDI messages from the data stream.
-            for (int offs = 0; offs < packet->length;) {
-                MidiMessage message(endpoint_id, packet->data[offs++]);
-                for (int dc = 0; offs < packet->length && (packet->data[offs] < 0x80); dc++, offs++)
-                    message.SetData(dc, packet->data[offs]);
-                message_queue.push(message);
+        for (int packetCount = 0; packetCount < packetList->numPackets; packetCount++)
+        {
+            // Only support single packet sysex
+            if (packet->data[0] == 0xf0 && packet->data[packet->length - 1] == 0xf7)
+            {
+                if (packet->data[1] == 0x00 &&
+                    packet->data[2] == 0x20 &&
+                    packet->data[3] == 0x76 &&  // teenage engineering
+                    packet->data[4] == 0x3)     // videolab
+                {
+                    MidiMessage message(endpoint_id, 0xf0);
+                    message.SetData(0, packet->data[5]);
+                    message.SetData(1, packet->data[6]);
+                    message_queue.push(message);
+                }
             }
+            else if (packet->data[0] >= 0x80)
+            {
+                for (int offs = 0; offs < packet->length;)
+                {
+                    MidiMessage message(endpoint_id, packet->data[offs++]);
+                    for (int dc = 0; offs < packet->length && (packet->data[offs] < 0x80); dc++, offs++)
+                        message.SetData(dc, packet->data[offs]);
+                    message_queue.push(message);
+                }
+            }
+            
             packet = MIDIPacketNext(packet);
         }
         
