@@ -52,6 +52,8 @@ namespace MidiJack
         // Channel state array
         ChannelState[] _channelArray;
 
+        bool _isPlaying;
+
         protected override void AddEndpoint() 
         {
             MidiDriver.AddSource(this);
@@ -118,6 +120,12 @@ namespace MidiJack
             return defaultValue;
         }
 
+        public bool IsPlaying()
+        {
+            MidiDriver.Refresh();
+            return _isPlaying;
+        }
+
         #endregion
 
         #region Event Delegates
@@ -126,7 +134,7 @@ namespace MidiJack
         public delegate void NoteOffDelegate(MidiChannel channel, int note);
         public delegate void KnobDelegate(MidiChannel channel, int knobNumber, float knobValue);
         public delegate void RealtimeDelegate(MidiRealtime realtimeMsg);
-        public delegate void SysexDelegate(int data1, int data2);
+        public delegate void SysexDelegate(MidiSysex id, int value);
 
         public NoteOnDelegate noteOnDelegate { get; set; }
         public NoteOffDelegate noteOffDelegate { get; set; }
@@ -225,21 +233,37 @@ namespace MidiJack
                     if (channelNumber == 0)
                     {
                         if (sysexDelegate != null)
-                            sysexDelegate(message.data1, message.data2);
+                            sysexDelegate((MidiSysex)message.data1, message.data2);
                     }
-                    else if (realtimeDelegate != null) 
+                    else
                     {
                         if (message.status == (byte)MidiRealtime.Clock)
-                            realtimeDelegate(MidiRealtime.Clock);
+                            if (realtimeDelegate != null)
+                                realtimeDelegate(MidiRealtime.Clock);
 
                         if (message.status == (byte)MidiRealtime.Start)
-                            realtimeDelegate(MidiRealtime.Start);
+                        {
+                            _isPlaying = true;
+
+                            if (realtimeDelegate != null)
+                                realtimeDelegate(MidiRealtime.Start);
+                        }
 
                         if (message.status == (byte)MidiRealtime.Continue)
-                            realtimeDelegate(MidiRealtime.Continue);
+                        {
+                            _isPlaying = true;
+
+                            if (realtimeDelegate != null)
+                                realtimeDelegate(MidiRealtime.Continue);
+                        }
 
                         if (message.status == (byte)MidiRealtime.Stop)
-                            realtimeDelegate(MidiRealtime.Stop);
+                        {
+                            _isPlaying = false;
+
+                            if (realtimeDelegate != null)
+                                realtimeDelegate(MidiRealtime.Stop);
+                        }
                     }
                 }
             }
