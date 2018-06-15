@@ -80,8 +80,8 @@ namespace
             if (packet->data[0] == 0xf0 && packet->data[packet->length - 1] == 0xf7)
             {
                 if (packet->data[1] == 0x00 &&
-                    packet->data[2] == 0x20 &&
-                    packet->data[3] == 0x76 &&  // teenage engineering
+                    packet->data[2] == 0x20 &&  // teenage
+                    packet->data[3] == 0x76 &&  // engineering
                     packet->data[4] == 0x3)     // videolab
                 {
                     MidiMessage message(endpoint_id, 0xf0);
