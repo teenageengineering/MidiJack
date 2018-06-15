@@ -7,8 +7,8 @@ using UnityEditor;
 namespace MidiJack
 {
     [CustomEditor(typeof(MidiEndpoint), true)]
-    public class MidiEndpointEditor : Editor {
-
+    public class MidiEndpointEditor : Editor 
+    {
         SerializedProperty _autoConnect;
         SerializedProperty _preferredName;
         SerializedProperty _midiMap;
@@ -53,7 +53,7 @@ namespace MidiJack
             if (endpointIndex == -1)
             {
                 endpointIds.Add(endpoint.endpointId);
-                endpointNames.Add(endpoint.endpointName + " *");
+                endpointNames.Add(endpoint.endpointName + " (offline)");
                 endpointIndex = endpointIds.Count - 1;
             }
 
