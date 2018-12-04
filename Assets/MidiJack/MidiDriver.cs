@@ -152,10 +152,64 @@ namespace MidiJack
 
         #region Native Plugin Interface
 
-        #if (!UNITY_IOS && !UNITY_TVOS)
-        const string _libName = "MidiJackPlugin";
+        #if UNITY_ANDROID
+
+        static AndroidJavaClass _pluginClass;
+        static AndroidJavaClass PluginClass {
+            get {
+                if (_pluginClass == null)
+                    _pluginClass = new AndroidJavaClass("com.teenageengineering.midijackplugin.PluginEntry");
+
+                return _pluginClass;
+            }
+        }
+
+        public static int CountSources()
+        {
+            return PluginClass.CallStatic<int>("MidiJackCountSources");
+        }
+
+        public static int CountDestinations()
+        {
+            return PluginClass.CallStatic<int>("MidiJackCountDestinations");
+        }
+
+        public static uint GetSourceIdAtIndex(int index)
+        {
+            return PluginClass.CallStatic<uint>("MidiJackGetSourceIdAtIndex", index);
+        }  
+
+        public static uint GetDestinationIdAtIndex(int index)
+        {
+            return PluginClass.CallStatic<uint>("MidiJackGetDestinationIdAtIndex", index);
+        }
+
+        public static string GetSourceName(uint id)
+        {
+            return PluginClass.CallStatic<string>("MidiJackGetSourceName", id);
+        }
+
+        public static string GetDestinationName(uint id)
+        {
+            return PluginClass.CallStatic<string>("MidiJackGetDestinationName", id);
+        }
+
+        public static ulong DequeueIncomingData()
+        {
+            return PluginClass.CallStatic<ulong>("MidiJackGetDestinationName");
+        }
+
+        public static void SendMessage(ulong msg)
+        {
+            PluginClass.CallStatic("MidiJackSendMessage", msg);
+        }
+
         #else
-        const string _libName = "__Internal";
+
+        #if (!UNITY_IOS && !UNITY_TVOS)
+                const string _libName = "MidiJackPlugin";
+        #else
+                const string _libName = "__Internal";
         #endif
 
         [DllImport(_libName, EntryPoint="MidiJackCountSources")]
@@ -189,6 +243,8 @@ namespace MidiJack
 
         [DllImport(_libName, EntryPoint="MidiJackSendMessage")]
         public static extern void SendMessage(ulong msg);
+
+#endif
 
         #endregion
 
