@@ -21,7 +21,7 @@ android {
 }
 
 dependencies {
-    implementation files('libs/UnityPlugin.jar')
+    compileOnly files('libs/UnityPlayer.jar')
 }
 
 android.libraryVariants.all { variant ->

@@ -158,7 +158,10 @@ namespace MidiJack
         static AndroidJavaClass PluginClass {
             get {
                 if (_pluginClass == null)
+                {
                     _pluginClass = new AndroidJavaClass("com.teenageengineering.midijackplugin.PluginEntry");
+                    _pluginClass.CallStatic("MidiJackStart");
+                }
 
                 return _pluginClass;
             }
@@ -176,32 +179,32 @@ namespace MidiJack
 
         public static uint GetSourceIdAtIndex(int index)
         {
-            return PluginClass.CallStatic<uint>("MidiJackGetSourceIdAtIndex", index);
+            return (uint)PluginClass.CallStatic<int>("MidiJackGetSourceIdAtIndex", index);
         }  
 
         public static uint GetDestinationIdAtIndex(int index)
         {
-            return PluginClass.CallStatic<uint>("MidiJackGetDestinationIdAtIndex", index);
+            return (uint)PluginClass.CallStatic<int>("MidiJackGetDestinationIdAtIndex", index);
         }
 
         public static string GetSourceName(uint id)
         {
-            return PluginClass.CallStatic<string>("MidiJackGetSourceName", id);
+            return PluginClass.CallStatic<string>("MidiJackGetSourceName", (int)id);
         }
 
         public static string GetDestinationName(uint id)
         {
-            return PluginClass.CallStatic<string>("MidiJackGetDestinationName", id);
+            return PluginClass.CallStatic<string>("MidiJackGetDestinationName", (int)id);
         }
 
         public static ulong DequeueIncomingData()
         {
-            return PluginClass.CallStatic<ulong>("MidiJackGetDestinationName");
+            return (ulong)PluginClass.CallStatic<long>("MidiJackDequeueIncomingData");
         }
 
         public static void SendMessage(ulong msg)
         {
-            PluginClass.CallStatic("MidiJackSendMessage", msg);
+            PluginClass.CallStatic("MidiJackSendMessage", (long)msg);
         }
 
         #else
@@ -244,7 +247,7 @@ namespace MidiJack
         [DllImport(_libName, EntryPoint="MidiJackSendMessage")]
         public static extern void SendMessage(ulong msg);
 
-#endif
+        #endif
 
         #endregion
 

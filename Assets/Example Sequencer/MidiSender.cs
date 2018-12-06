@@ -7,7 +7,7 @@ public class MidiSender : MonoBehaviour {
 
 	public void OnNoteOnEvent()
 	{
-		MidiMaster.SendKeyDown(0, 60, 100);
+		MidiMaster.SendKeyDown(0, 60, 1);
 	}
 
 	public void OnNoteOffEvent()

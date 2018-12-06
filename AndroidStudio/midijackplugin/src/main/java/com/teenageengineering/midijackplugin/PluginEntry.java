@@ -1,7 +1,7 @@
 package com.teenageengineering.midijackplugin;
 
-import android.app.Activity;
 import android.app.Fragment;
+import android.os.Bundle;
 import android.content.Context;
 import android.media.midi.MidiDevice;
 import android.media.midi.MidiDeviceInfo;
@@ -11,10 +11,10 @@ import android.media.midi.MidiOutputPort;
 import android.media.midi.MidiReceiver;
 
 import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Queue;
 import java.util.ArrayList;
+import java.util.Queue;
 import java.util.concurrent.ArrayBlockingQueue;
+import java.util.NoSuchElementException;
 import java.nio.ByteBuffer;
 
 import com.unity3d.player.UnityPlayer;
@@ -28,8 +28,8 @@ public class PluginEntry extends Fragment {
         byte mStatus;
         byte mData[] = new byte[2];
 
-        MidiMessage(int mEndpoint, byte status) {
-            mEndpoint = mEndpoint;
+        MidiMessage(int endpoint, byte status) {
+            mEndpoint = endpoint;
             mStatus = status;
         }
 
@@ -40,12 +40,11 @@ public class PluginEntry extends Fragment {
         }
 
         long Encode64Bit() {
-            long ul = (int)mEndpoint;
-            ul |= (long)mData[0] << 32;
-            ul |= (long)mData[1] << 40;
-            ul |= (long)mData[2] << 48;
-            ul |= (long)mData[3] << 56;
-            return ul;
+            long l = mEndpoint;
+            l |= (long)(mStatus & 0xFF) << 32;
+            l |= (long)(mData[0] & 0xFF) << 40;
+            l |= (long)(mData[1] & 0xFF) << 48;
+            return l;
         }
     };
 
@@ -83,20 +82,23 @@ public class PluginEntry extends Fragment {
     public MidiManager mMidiManager;
 
     public PluginEntry() {
-        Activity activity = UnityPlayer.currentActivity;
-        activity.getFragmentManager().beginTransaction().add(instance, "PluginEntry").commit();
-
-        mMidiManager = (MidiManager)activity.getSystemService(Context.MIDI_SERVICE);
-        mMidiManager.registerDeviceCallback(new MidiJackDeviceCallback(), null);
-
         mOutputs = new ArrayList<MidiJackOutput>();
         mInputs = new ArrayList<MidiJackInput>();
-
         mMessageQueue = new ArrayBlockingQueue<MidiMessage>(1024);
+    }
 
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setRetainInstance(true); // Retain between configuration changes (like device rotation)
+    }
+
+    public void SetMidiManager(MidiManager midiManager) {
+        mMidiManager = midiManager;
+        mMidiManager.registerDeviceCallback(new MidiJackDeviceCallback(), null);
         // Enumerate all MIDI inputs and outputs
-        MidiDeviceInfo[] deviceInfos = mMidiManager.getDevices();
-        for (final MidiDeviceInfo deviceInfo : deviceInfos)
+        MidiDeviceInfo[] deviceInfos = instance.mMidiManager.getDevices();
+        for (MidiDeviceInfo deviceInfo : deviceInfos)
             AddDevice(deviceInfo);
     }
 
@@ -160,10 +162,7 @@ public class PluginEntry extends Fragment {
         public void onDeviceAdded(MidiDeviceInfo deviceInfo) {
             instance.AddDevice(deviceInfo);
         }
-
-        public void onDeviceRemoved(MidiDeviceInfo deviceInfo) {
-            instance.RemoveDevice(deviceInfo);
-        }
+        public void onDeviceRemoved(MidiDeviceInfo deviceInfo) { instance.RemoveDevice(deviceInfo); }
     }
 
     class MidiJackReceiver extends MidiReceiver {
@@ -175,17 +174,18 @@ public class PluginEntry extends Fragment {
 
         @Override
         public void onSend(byte[] msg, int start, int count, long timestamp) {
-            if (msg[start] == MidiConstants.STATUS_SYSTEM_EXCLUSIVE && msg[start + count - 1] == MidiConstants.STATUS_END_SYSEX) {
-                if (msg[start + 1] == 0x00 &&
-                    msg[start + 2] == 0x20 &&  // teenage
-                    msg[start + 3] == 0x76 &&  // engineering
-                    msg[start + 4] == 0x3)     // videolab
+            int status = msg[start] & 0xFF;
+            if (status == MidiConstants.STATUS_SYSTEM_EXCLUSIVE && (int)(msg[start + count - 1] & 0xFF) == MidiConstants.STATUS_END_SYSEX) {
+                if ((int)(msg[start + 1] & 0xFF) == 0x00 &&
+                    (int)(msg[start + 2] & 0xFF) == 0x20 &&  // teenage
+                    (int)(msg[start + 3] & 0xFF) == 0x76 &&  // engineering
+                    (int)(msg[start + 4] & 0xFF) == 0x3)     // videolab
                 {
                     MidiMessage message = new MidiMessage(mInputId, msg[start]);
                     message.SetData(msg, start + 5, 2);
                     instance.mMessageQueue.add(message);
                 }
-            } else if (msg[start] >= MidiConstants.STATUS_NOTE_OFF) {
+            } else if (status >= MidiConstants.STATUS_NOTE_OFF) {
                 MidiMessage message = new MidiMessage(mInputId, msg[start]);
                 message.SetData(msg, start + 1, count - 1);
                 instance.mMessageQueue.add(message);
@@ -195,13 +195,15 @@ public class PluginEntry extends Fragment {
 
     //endregion
 
+    //region plugin interface
+
     private static PluginEntry instance;
 
-    public static void start() {
+    public static void MidiJackStart() {
         instance = new PluginEntry();
+        instance.SetMidiManager((MidiManager)UnityPlayer.currentActivity.getSystemService(Context.MIDI_SERVICE));
+        UnityPlayer.currentActivity.getFragmentManager().beginTransaction().add(instance, "PluginEntry").commit();
     }
-
-    //region plugin interface
 
     public static int MidiJackCountSources() {
         try {
@@ -237,8 +239,7 @@ public class PluginEntry extends Fragment {
 
     public static String MidiJackGetSourceName(int id) {
         try {
-            MidiJackOutput output = instance.GetOutputWithId(id);
-            return output.mName;
+            return instance.GetOutputWithId(id).mName;
         } catch (Exception e) {
             return "(not ready)";
         }
@@ -246,8 +247,7 @@ public class PluginEntry extends Fragment {
 
     public static String MidiJackGetDestinationName(int id) {
         try {
-            MidiJackInput input = instance.GetInputWithId(id);
-            return input.mName;
+            return instance.GetInputWithId(id).mName;
         } catch (Exception e) {
             return "(not ready)";
         }
@@ -255,8 +255,7 @@ public class PluginEntry extends Fragment {
 
     public static long MidiJackDequeueIncomingData() {
         try {
-            MidiMessage msg = instance.mMessageQueue.remove();
-            return msg.Encode64Bit();
+            return instance.mMessageQueue.remove().Encode64Bit();
         } catch (Exception e) {
             return 0;
         }
@@ -267,7 +266,6 @@ public class PluginEntry extends Fragment {
         try {
             ByteBuffer buffer = ByteBuffer.allocate(Long.BYTES);
             buffer.putLong(msg);
-
             MidiJackInput input = instance.GetInputWithId(inputId);
             input.mPort.send(buffer.array(), 4, 3);
         } catch (Exception e) {}
