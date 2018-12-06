@@ -90,7 +90,7 @@ MidiSource also provides a delegate for realtime events.
 Current Limitations
 -------------------
 
-- Currently MIDI Jack only supports Windows, OS X and iOS.
+- Currently MIDI Jack supports Windows, OS X, iOS and Android.
 - Only supports note, CC and realtime messages. No support for program changes nor
   SysEx.
 - The MIDI Jack plugin always tries to capture all available MIDI devices.
