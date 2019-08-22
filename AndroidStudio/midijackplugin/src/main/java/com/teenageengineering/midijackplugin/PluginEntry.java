@@ -103,6 +103,7 @@ public class PluginEntry extends Fragment {
     }
 
     public void AddDevice(final MidiDeviceInfo deviceInfo) {
+        final String deviceName = deviceInfo.getProperties().getString(deviceInfo.PROPERTY_NAME);
         mMidiManager.openDevice(deviceInfo, new MidiManager.OnDeviceOpenedListener() {
             @Override
             public void onDeviceOpened(MidiDevice device) {
@@ -110,7 +111,7 @@ public class PluginEntry extends Fragment {
                     MidiDeviceInfo.PortInfo[] portInfos = deviceInfo.getPorts();
                     for (MidiDeviceInfo.PortInfo portInfo : portInfos) {
                         int portId = portInfo.hashCode();
-                        String portName = portInfo.getName();
+                        String portName = deviceName + " " + portInfo.getName();
                         if (portInfo.getType() == MidiDeviceInfo.PortInfo.TYPE_OUTPUT) {
                             MidiOutputPort outputPort = device.openOutputPort(portInfo.getPortNumber());
                             outputPort.connect(new MidiFramer(new MidiJackReceiver(portId)));
@@ -131,7 +132,6 @@ public class PluginEntry extends Fragment {
         MidiDeviceInfo.PortInfo[] portInfos = deviceInfo.getPorts();
         for (MidiDeviceInfo.PortInfo portInfo : portInfos) {
             int portId = portInfo.hashCode();
-            String portName = portInfo.getName();
             if (portInfo.getType() == MidiDeviceInfo.PortInfo.TYPE_OUTPUT) {
                 MidiJackOutput output = GetOutputWithId(portId);
                 mOutputs.remove(output);
