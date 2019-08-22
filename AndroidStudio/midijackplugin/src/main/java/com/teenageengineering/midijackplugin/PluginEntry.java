@@ -162,7 +162,9 @@ public class PluginEntry extends Fragment {
         public void onDeviceAdded(MidiDeviceInfo deviceInfo) {
             instance.AddDevice(deviceInfo);
         }
-        public void onDeviceRemoved(MidiDeviceInfo deviceInfo) { instance.RemoveDevice(deviceInfo); }
+        public void onDeviceRemoved(MidiDeviceInfo deviceInfo) {
+            instance.RemoveDevice(deviceInfo);
+        }
     }
 
     class MidiJackReceiver extends MidiReceiver {
